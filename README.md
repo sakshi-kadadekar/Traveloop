@@ -1,27 +1,64 @@
-# 🌍 Traveloop: Seamless Multi-City Trip Planning> **Personalized. Intelligent. Collaborative.**  > Built for Hackathon by **Team Sakshi & Anand**---## 🚀 Live Links- 🌐 Frontend: https://your-frontend-link.vercel.app  - ⚙️ Backend: https://your-backend-link.onrender.com  - 📦 GitHub: https://github.com/your-username/traveloop  ---## 📌 Status![Status](https://img.shields.io/badge/Status-Live-success?style=for-the-badge)![Stack](https://img.shields.io/badge/Stack-Fullstack_JS-blue?style=for-the-badge)![Backend](https://img.shields.io/badge/Backend-Render-lightgrey?style=for-the-badge&logo=render)![Frontend](https://img.shields.io/badge/Frontend-Vercel-black?style=for-the-badge&logo=vercel)---## 📖 About ProjectTraveloop is a full-stack smart travel planning platform that helps users create, manage, and share multi-city trips easily. It removes the complexity of planning travel by combining itinerary building, budgeting, and collaboration in one place.---## ✨ Features- 🗺️ Drag & Drop Itinerary Builder  - 💰 Smart Budget Tracking  - 🔍 City & Activity Discovery  - 📋 Packing Checklist Wizard  - 📊 Admin Analytics Dashboard  - 🔗 Shareable Trip Links  ---## 🛠️ Tech Stack- Frontend: React + Vite + Tailwind CSS  - Backend: Node.js + Express  - Database: PostgreSQL + Prisma  - Auth: JWT  - Hosting: Vercel + Render  ---## 📁 Project Structure
+# 🌍 Traveloop: Enterprise-Grade Travel Planning Platform
+> **Dream. Design. Discover.**
+> A robust full-stack ecosystem developed by **Team Sakshi & Anand**.
+
+[![Status](https://img.shields.io/badge/Status-Live-success?style=for-the-badge)]()
+[![Frontend](https://img.shields.io/badge/Frontend-Vercel-black?style=for-the-badge&logo=vercel)](https://traveloop-wc1h.vercel.app/)
+[![Backend](https://img.shields.io/badge/Backend-Render-lightgrey?style=for-the-badge&logo=render)](https://traveloop-api-xuzt.onrender.com)
+[![DB](https://img.shields.io/badge/Database-PostgreSQL-blue?style=for-the-badge&logo=postgresql)]()
+
+---
+
+## 🚀 Live Production Environment
+- **💻 Live Web App:** [https://traveloop-wc1h.vercel.app/](https://traveloop-wc1h.vercel.app/)
+- **⚙️ Backend API:** [https://traveloop-api-xuzt.onrender.com](https://traveloop-api-xuzt.onrender.com)
+- **🟢 System Health:** [https://traveloop-api-xuzt.onrender.com/health](https://traveloop-api-xuzt.onrender.com/health)
+
+---
+
+## 📖 Project Overview
+Traveloop is a comprehensive SaaS travel planning application. It solves the complexity of multi-city travel by offering a unified interface for itinerary building, automated budgeting, and collaborative sharing.
+
+### **Core Capabilities:**
+- **Customized Multi-City Itineraries:** Structured day-wise planning.
+- **Automated Budgeting:** Real-time expense tracking and invoice generation.
+- **Global Search:** Discover cities and activities with popularity and cost indices.
+- **Utility Suite:** Integrated packing checklists and digital travel journals.
+
+---
+
+## 🛠️ Tech Stack
+
+**Frontend:**
+- `React 19.2.5` + `Vite` (Build Tool)
+- `Tailwind CSS 4.3.0` (Modern Styling)
+- `React Router 7.15.0` (Routing)
+- `Axios` (HTTP Client) & `Recharts` (Analytics Visualization)
+
+**Backend:**
+- `Node.js` + `Express 5.2.1`
+- `Prisma 7.8.0` (ORM)
+- `PostgreSQL` (Neon Managed DB)
+- `JWT` & `bcryptjs` (Security & Hashing)
+
+---
+
+## 📐 System Architecture
+
+<details>
+<summary>📂 View Full Project Structure</summary>
+
+```text
 Traveloop/
-├── client/   (React Frontend)
-├── server/   (Node Backend)
+├── 📱 client/            # React + Vite Frontend
+│   ├── src/
+│   │   ├── pages/        # 14 specialized screens (Login, Builder, Admin, etc.)
+│   │   ├── components/   # Modular UI (Navbar, TripCards)
+│   │   ├── api/          # Axios HTTP client configuration
+│   │   └── App.jsx       # Central Routing Logic
+├── ⚙️ server/            # Express Backend
+│   ├── routes/           # 10 modular API controllers
+│   ├── middleware/       # JWT Auth & Security verification
+│   ├── prisma/           # Data Models & Migrations
+│   ├── index.js          # Express entry point & Health Check
 └── README.md
----## ⚙️ Setup```bashgit clone https://github.com/your-username/traveloop.gitcd traveloop
-Frontend
-cd clientnpm installnpm run dev
-Backend
-cd servernpm installnpm run dev
-
-📡 API Health
-GET /health
-Response:
-{ "status": "ok" }
-
-👨‍💻 Team
-
-
-Sakshi – Frontend
-
-
-Anand – Backend
-
-
-
-⭐ If you like this project, give it a star!
