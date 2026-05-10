@@ -1,33 +1,20 @@
 const express = require('express')
 const cors = require('cors')
-const { Pool } = require('pg')
+const prisma = require('./prisma')
 require('dotenv').config()
 
 const app = express()
 
-const checkDatabaseConnection = async () => {
-  if (!process.env.DATABASE_URL) {
-    console.log('DB connection error: DATABASE_URL is not set')
-    return
-  }
-
-  const pool = new Pool({
-    connectionString: process.env.DATABASE_URL,
-    ssl: { rejectUnauthorized: false },
-  })
-
+async function testDB() {
   try {
-    const client = await pool.connect()
+    await prisma.$connect()
     console.log('Neon DB connected')
-    client.release()
-  } catch (err) {
-    console.log('DB connection error:', err.message)
-  } finally {
-    await pool.end()
+  } catch (error) {
+    console.log('DB connection failed:', error.message)
   }
 }
 
-checkDatabaseConnection()
+testDB()
 
 app.use(cors())
 app.use(express.json())
