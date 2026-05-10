@@ -7,8 +7,16 @@ const app = express()
 app.use(cors())
 app.use(express.json())
 
+app.get('/health', (_req, res) => {
+  res.status(200).json({
+    status: 'ok',
+  })
+})
+
 app.get('/api/health', (_req, res) => {
-  res.json({ ok: true })
+  res.status(200).json({
+    status: 'ok',
+  })
 })
 
 app.use('/api/auth', require('./routes/auth'))
@@ -20,12 +28,6 @@ app.use('/api/notes', require('./routes/notes'))
 app.use('/api/invoices', require('./routes/invoices'))
 app.use('/api/admin', require('./routes/admin'))
 app.use('/api/cities', require('./routes/cities'))
-
-app.get('/health', (_req, res) => {
-  res.status(200).json({
-    status: 'ok',
-  })
-})
 
 app.use((_req, res) => {
   res.status(404).json({ error: 'Route not found', message: 'Route not found' })
