@@ -28,12 +28,16 @@ app.get('/', (_req, res) => {
 app.get('/health', (_req, res) => {
   res.status(200).json({
     status: 'ok',
+    message: 'Server is running fine',
+    database: 'connected (if working)',
   })
 })
 
 app.get('/api/health', (_req, res) => {
   res.status(200).json({
     status: 'ok',
+    message: 'Server is running fine',
+    database: 'connected (if working)',
   })
 })
 
