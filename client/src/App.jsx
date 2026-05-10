@@ -359,17 +359,63 @@ function ActivityLine({ activity, action }) {
 }
 
 function ProfileScreen() {
+  const [profile, setProfile] = useState({
+    firstName: 'James',
+    lastName: 'Cristina',
+    email: 'james@traveloop.app',
+    phone: '+91 98765 43210',
+    city: 'Delhi',
+    country: 'India',
+  })
+  const [savedProfile, setSavedProfile] = useState(profile)
+  const [saveMessage, setSaveMessage] = useState('')
+
+  const updateProfile = (key, value) => {
+    setProfile((current) => ({ ...current, [key]: value }))
+    setSaveMessage('')
+  }
+
+  const saveProfile = () => {
+    setSavedProfile(profile)
+    setSaveMessage('Profile updated')
+  }
+
+  const profileFields = [
+    ['firstName', 'First Name'],
+    ['lastName', 'Last Name'],
+    ['email', 'Email'],
+    ['phone', 'Phone'],
+    ['city', 'City'],
+    ['country', 'Country'],
+  ]
+
   return (
     <Screen heading="User Profile 👤" kicker="Manage your account and travel preferences">
       <div style={{ ...card, maxWidth: 820 }}>
         <div style={{ display: 'flex', gap: '1.2rem', alignItems: 'center', marginBottom: '1.4rem' }}>
           <div style={{ width: 82, height: 82, borderRadius: '50%', display: 'grid', placeItems: 'center', background: `linear-gradient(135deg, ${COLORS.purple}, ${COLORS.accent})`, fontSize: '2rem' }}>👤</div>
-          <div><strong style={{ fontSize: '1.2rem' }}>James Arjun Jerry Cristina</strong><div style={{ color: COLORS.muted }}>james@traveloop.app</div></div>
+          <div>
+            <strong style={{ fontSize: '1.2rem' }}>{savedProfile.firstName} {savedProfile.lastName}</strong>
+            <div style={{ color: COLORS.muted }}>{savedProfile.email}</div>
+          </div>
         </div>
         <div style={grid(240)}>
-          {['First Name', 'Last Name', 'Email', 'Phone', 'City', 'Country'].map((field) => <input key={field} style={input} defaultValue={field === 'Email' ? 'james@traveloop.app' : field === 'Phone' ? '+91 98765 43210' : field === 'Country' ? 'India' : field === 'City' ? 'Delhi' : field.replace(' Name', '')} />)}
+          {profileFields.map(([key, label]) => (
+            <input
+              key={key}
+              aria-label={label}
+              style={input}
+              type={key === 'email' ? 'email' : 'text'}
+              value={profile[key]}
+              onChange={(event) => updateProfile(key, event.target.value)}
+              placeholder={label}
+            />
+          ))}
         </div>
-        <button style={{ ...button(), marginTop: '1rem' }}>Save Changes</button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', marginTop: '1rem', flexWrap: 'wrap' }}>
+          <button style={button()} onClick={saveProfile}>Save Changes</button>
+          {saveMessage && <span style={{ color: COLORS.green, fontWeight: 800, fontSize: '0.85rem' }}>{saveMessage}</span>}
+        </div>
       </div>
       <div style={grid(180)}>{[['3', 'Trips Created', COLORS.accent], ['7', 'Cities Visited', COLORS.green], ['12', 'Activities Done', COLORS.blue]].map(([num, label, color]) => <div key={label} style={{ ...card, textAlign: 'center' }}><div style={{ color, fontSize: '2rem', fontWeight: 900 }}>{num}</div><div style={{ color: COLORS.muted }}>{label}</div></div>)}</div>
     </Screen>
