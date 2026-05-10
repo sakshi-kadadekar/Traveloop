@@ -21,17 +21,15 @@ app.use('/api/invoices', require('./routes/invoices'))
 app.use('/api/admin', require('./routes/admin'))
 app.use('/api/cities', require('./routes/cities'))
 
+app.get('/health', (_req, res) => {
+  res.status(200).json({
+    status: 'ok',
+  })
+})
+
 app.use((_req, res) => {
   res.status(404).json({ error: 'Route not found', message: 'Route not found' })
 })
-
-// Health route for Render free tier keep-alive monitoring
-app.get("/health", (req, res) => {
-  res.status(200).json({
-    status: "OK",
-    message: "Traveloop backend is running"
-  });
-});
 
 const PORT = process.env.PORT || 5050
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`))
