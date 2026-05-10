@@ -13,6 +13,7 @@ export default function Navbar() {
       <div className="flex gap-4 text-gray-300 text-sm">
         <Link to="/" className="hover:text-white">Home</Link>
         <Link to="/trips" className="hover:text-white">My Trips</Link>
+        <Link to="/cities" className="hover:text-white">Cities</Link>
         <Link to="/community" className="hover:text-white">Community</Link>
         <Link to="/profile" className="hover:text-white">Profile</Link>
         <button onClick={logout} className="text-red-400 hover:text-red-300">Logout</button>

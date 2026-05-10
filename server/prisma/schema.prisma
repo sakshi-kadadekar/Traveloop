@@ -44,7 +44,9 @@ model Stop {
   id         String     @id @default(uuid())
   tripId     String
   trip       Trip       @relation(fields: [tripId], references: [id], onDelete: Cascade)
-  city       String
+  cityId     String?
+  city       City?      @relation(fields: [cityId], references: [id])
+  cityName   String     @default("")
   country    String?
   startDate  DateTime
   endDate    DateTime
@@ -105,4 +107,30 @@ model Invoice {
   travelers   String[]
   items       Json
   total       Float
+}
+
+model City {
+  id             String           @id @default(uuid())
+  name           String
+  country        String
+  region         String?
+  image          String?
+  costIndex      Float            @default(1.0)
+  popularity     Int              @default(0)
+  createdAt      DateTime         @default(now())
+  stops          Stop[]
+  globalActivities GlobalActivity[]
+}
+
+model GlobalActivity {
+  id          String  @id @default(uuid())
+  name        String
+  type        String
+  cityId      String
+  city        City    @relation(fields: [cityId], references: [id])
+  image       String?
+  description String?
+  duration    String?
+  cost        Float   @default(0)
+  createdAt   DateTime @default(now())
 }

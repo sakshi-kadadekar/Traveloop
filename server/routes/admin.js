@@ -14,9 +14,9 @@ router.get('/stats', auth, adminOnly, async (_req, res) => {
   const totalUsers = await prisma.user.count()
   const totalTrips = await prisma.trip.count()
   const topCities = await prisma.stop.groupBy({
-    by: ['city'],
-    _count: { city: true },
-    orderBy: { _count: { city: 'desc' } },
+    by: ['cityName'],
+    _count: { cityName: true },
+    orderBy: { _count: { cityName: 'desc' } },
     take: 5,
   })
   const topActivities = await prisma.activity.groupBy({

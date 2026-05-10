@@ -5,6 +5,7 @@ import Budget from './pages/Budget'
 import Community from './pages/Community'
 import CreateTrip from './pages/CreateTrip'
 import Dashboard from './pages/Dashboard'
+import CitySearch from './pages/CitySearch'
 import ItineraryBuilder from './pages/ItineraryBuilder'
 import ItineraryView from './pages/ItineraryView'
 import Login from './pages/Login'
@@ -27,6 +28,7 @@ export default function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
         <Route path="/trips" element={<PrivateRoute><MyTrips /></PrivateRoute>} />
+        <Route path="/cities" element={<PrivateRoute><CitySearch /></PrivateRoute>} />
         <Route path="/trips/new" element={<PrivateRoute><CreateTrip /></PrivateRoute>} />
         <Route path="/trips/:id/build" element={<PrivateRoute><ItineraryBuilder /></PrivateRoute>} />
         <Route path="/trips/:id/view" element={<PrivateRoute><ItineraryView /></PrivateRoute>} />

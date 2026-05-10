@@ -1,94 +1,151 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 import API from '../api/axios'
 import Navbar from '../components/Navbar'
 
-const types = ['general', 'food', 'transport', 'stay']
-
 export default function ActivitySearch() {
-  const { id } = useParams()
-  const [results, setResults] = useState([])
+  const { id } = useParams() // Trip ID
+  const [trip, setTrip] = useState(null)
+  const [globalActivities, setGlobalActivities] = useState([])
   const [query, setQuery] = useState('')
-  const [form, setForm] = useState({ stopId: '', name: '', type: 'general', cost: '' })
+  const [typeFilter, setTypeFilter] = useState('')
+  const [maxCost, setMaxCost] = useState('')
+  const [selectedStopId, setSelectedStopId] = useState('')
 
-  const searchActivities = async () => {
-    if (!query.trim()) return
-    const res = await API.get('/activities/search', { params: { q: query, tripId: id } })
-    setResults(res.data)
-  }
-
-  const saveActivity = async () => {
-    if (!form.stopId || !form.name.trim()) return
-    const res = await API.post('/activities', {
-      ...form,
-      cost: Number.parseFloat(form.cost || 0),
+  useEffect(() => {
+    API.get(`/trips/${id}`).then(res => {
+      setTrip(res.data)
+      if (res.data.stops?.length > 0) {
+        setSelectedStopId(res.data.stops[0].id)
+      }
     })
-    setResults([res.data, ...results])
-    setForm({ stopId: '', name: '', type: 'general', cost: '' })
+  }, [id])
+
+  useEffect(() => {
+    if (selectedStopId) {
+      searchGlobalActivities()
+    }
+  }, [selectedStopId, query, typeFilter, maxCost])
+
+  const searchGlobalActivities = async () => {
+    const stop = trip?.stops?.find(s => s.id === selectedStopId)
+    const cityId = stop?.cityId
+    const res = await API.get('/activities/global', { params: { cityId, type: typeFilter, maxCost } })
+    let filtered = res.data
+    if (query) {
+      filtered = filtered.filter(a => a.name.toLowerCase().includes(query.toLowerCase()))
+    }
+    setGlobalActivities(filtered)
   }
+
+  const addToItinerary = async (act) => {
+    if (!selectedStopId) return
+    await API.post('/activities', {
+      stopId: selectedStopId,
+      name: act.name,
+      type: act.type,
+      cost: act.cost,
+      duration: act.duration,
+      description: act.description
+    })
+    const res = await API.get(`/trips/${id}`)
+    setTrip(res.data)
+    alert('Activity added!')
+  }
+
+  const removeActivity = async (actId) => {
+    await API.delete(`/activities/${actId}`)
+    const res = await API.get(`/trips/${id}`)
+    setTrip(res.data)
+  }
+
+  const currentStopActivities = trip?.stops?.find(s => s.id === selectedStopId)?.activities || []
 
   return (
     <div className="min-h-screen bg-gray-950 text-white">
       <Navbar />
-      <div className="mx-auto max-w-4xl p-6">
+      <div className="mx-auto max-w-6xl p-6">
         <h1 className="mb-6 text-3xl font-bold">Activity Search</h1>
 
-        <div className="mb-6 flex gap-2">
+        <div className="mb-6 rounded-xl bg-gray-900 p-4">
+          <label className="mb-2 block font-bold text-amber-400">Select Stop/City</label>
+          <select
+            className="w-full rounded-lg bg-gray-800 p-3 text-white outline-none"
+            value={selectedStopId}
+            onChange={e => setSelectedStopId(e.target.value)}
+          >
+            {trip?.stops?.map(stop => (
+              <option key={stop.id} value={stop.id}>
+                {stop.cityName || stop.city?.name || 'Unknown City'} ({stop.startDate?.slice(0,10)})
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="mb-8 grid gap-4 md:grid-cols-4">
           <input
-            className="flex-1 rounded-lg bg-gray-900 p-3 text-white outline-none"
-            placeholder="Search activities"
+            className="rounded-lg bg-gray-900 p-3 text-white outline-none"
+            placeholder="Search activities..."
             value={query}
             onChange={e => setQuery(e.target.value)}
           />
-          <button onClick={searchActivities} className="rounded-lg bg-amber-400 px-5 py-3 font-bold text-black">
-            Search
-          </button>
+          <select
+            className="rounded-lg bg-gray-900 p-3 text-white outline-none"
+            value={typeFilter}
+            onChange={e => setTypeFilter(e.target.value)}
+          >
+            <option value="">All Types</option>
+            <option value="food">Food & Drink</option>
+            <option value="sightseeing">Sightseeing</option>
+            <option value="adventure">Adventure</option>
+            <option value="cultural">Cultural</option>
+          </select>
+          <input
+            type="number"
+            className="rounded-lg bg-gray-900 p-3 text-white outline-none"
+            placeholder="Max Cost"
+            value={maxCost}
+            onChange={e => setMaxCost(e.target.value)}
+          />
         </div>
 
-        <div className="mb-8 rounded-xl bg-gray-900 p-5">
-          <h2 className="mb-3 font-bold text-amber-400">Add Activity</h2>
-          <div className="grid gap-3 md:grid-cols-4">
-            <input
-              className="rounded-lg bg-gray-800 p-3 outline-none"
-              placeholder="Stop ID"
-              value={form.stopId}
-              onChange={e => setForm({ ...form, stopId: e.target.value })}
-            />
-            <input
-              className="rounded-lg bg-gray-800 p-3 outline-none"
-              placeholder="Activity name"
-              value={form.name}
-              onChange={e => setForm({ ...form, name: e.target.value })}
-            />
-            <select
-              className="rounded-lg bg-gray-800 p-3 outline-none"
-              value={form.type}
-              onChange={e => setForm({ ...form, type: e.target.value })}
-            >
-              {types.map(type => <option key={type}>{type}</option>)}
-            </select>
-            <input
-              className="rounded-lg bg-gray-800 p-3 outline-none"
-              placeholder="Cost"
-              value={form.cost}
-              onChange={e => setForm({ ...form, cost: e.target.value })}
-            />
-          </div>
-          <button onClick={saveActivity} className="mt-3 rounded-lg bg-amber-400 px-5 py-2 font-bold text-black">
-            Save
-          </button>
-        </div>
-
-        <div className="space-y-3">
-          {results.map(activity => (
-            <div key={activity.id || activity.name} className="rounded-xl bg-gray-900 p-4">
-              <div className="flex items-center justify-between gap-4">
-                <h3 className="font-bold">{activity.name}</h3>
-                <span className="text-amber-400">₹{activity.cost || 0}</span>
-              </div>
-              <p className="text-sm capitalize text-gray-400">{activity.type || 'general'}</p>
+        <div className="grid gap-6 md:grid-cols-2">
+          <div>
+            <h2 className="mb-4 text-xl font-bold text-gray-300">Available Activities</h2>
+            <div className="space-y-4">
+              {globalActivities.length === 0 && <p className="text-gray-500">No activities found for this city/filters.</p>}
+              {globalActivities.map(act => (
+                <div key={act.id} className="flex gap-4 rounded-xl bg-gray-900 p-4">
+                  <img src={act.image || 'https://images.unsplash.com/photo-1533105079780-92b9be482077?auto=format&fit=crop&q=80&w=300'} alt={act.name} className="h-24 w-24 rounded-lg object-cover" />
+                  <div className="flex-1">
+                    <h3 className="font-bold">{act.name}</h3>
+                    <p className="mb-2 text-sm text-gray-400">{act.description}</p>
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-gray-300">⏱ {act.duration}</span>
+                      <span className="font-bold text-amber-400">₹{act.cost}</span>
+                    </div>
+                  </div>
+                  <button onClick={() => addToItinerary(act)} className="self-center rounded-full bg-amber-400 p-2 font-bold text-black">+</button>
+                </div>
+              ))}
             </div>
-          ))}
+          </div>
+
+          <div>
+            <h2 className="mb-4 text-xl font-bold text-amber-400">In Your Itinerary</h2>
+            <div className="space-y-4">
+              {currentStopActivities.length === 0 && <p className="text-gray-500">No activities added yet.</p>}
+              {currentStopActivities.map(act => (
+                <div key={act.id} className="flex items-center justify-between rounded-xl bg-gray-800 p-4 border border-amber-400/20">
+                  <div>
+                    <h3 className="font-bold">{act.name}</h3>
+                    <p className="text-sm text-gray-400">{act.duration} • ₹{act.cost}</p>
+                  </div>
+                  <button onClick={() => removeActivity(act.id)} className="text-red-400 hover:text-red-300">Remove</button>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     </div>

@@ -96,4 +96,44 @@ router.delete('/:id', auth, async (req, res) => {
   res.json({ message: 'Deleted' })
 })
 
+router.post('/:id/copy', auth, async (req, res) => {
+  const original = await prisma.trip.findUnique({
+    where: { id: req.params.id },
+    include: { stops: { include: { activities: true } } }
+  })
+  if (!original) return res.status(404).json({ error: 'Trip not found' })
+
+  const copy = await prisma.trip.create({
+    data: {
+      userId: req.user.id,
+      name: original.name + ' (Copy)',
+      description: original.description,
+      coverPhoto: original.coverPhoto,
+      isPublic: false,
+      status: 'upcoming',
+      stops: {
+        create: original.stops.map(stop => ({
+          cityId: stop.cityId,
+          cityName: stop.cityName,
+          country: stop.country,
+          startDate: stop.startDate,
+          endDate: stop.endDate,
+          orderIndex: stop.orderIndex,
+          activities: {
+            create: stop.activities.map(act => ({
+              name: act.name,
+              type: act.type,
+              cost: act.cost,
+              duration: act.duration,
+              timeOfDay: act.timeOfDay,
+              description: act.description
+            }))
+          }
+        }))
+      }
+    }
+  })
+  res.json(copy)
+})
+
 module.exports = router

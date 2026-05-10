@@ -8,6 +8,17 @@ const findOwnedActivity = async (activityId, userId) => {
   })
 }
 
+router.get('/global', auth, async (req, res) => {
+  const { cityId, type, maxCost } = req.query
+  const where = {}
+  if (cityId) where.cityId = cityId
+  if (type) where.type = type
+  if (maxCost) where.cost = { lte: Number(maxCost) }
+
+  const activities = await prisma.globalActivity.findMany({ where })
+  res.json(activities)
+})
+
 router.get('/search', auth, async (req, res) => {
   const query = req.query.q || ''
   const activities = await prisma.activity.findMany({
