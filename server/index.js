@@ -46,6 +46,7 @@ app.use('/api/notes', require('./routes/notes'))
 app.use('/api/invoices', require('./routes/invoices'))
 app.use('/api/admin', require('./routes/admin'))
 app.use('/api/cities', require('./routes/cities'))
+app.use('/api/profile', require('./routes/profile'))
 
 app.use((_req, res) => {
   res.status(404).json({ error: 'Route not found', message: 'Route not found' })

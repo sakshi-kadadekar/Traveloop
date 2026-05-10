@@ -15,6 +15,34 @@ const COLORS = {
   blue: '#3b82f6',
 }
 
+const API_BASE = import.meta.env.VITE_API_URL || 'https://traveloop-api-68et.onrender.com/api'
+
+const defaultProfile = {
+  firstName: 'James',
+  lastName: 'Cristina',
+  email: 'james@traveloop.app',
+  phone: '+91 98765 43210',
+  city: 'Delhi',
+  country: 'India',
+}
+
+const getStoredProfile = () => {
+  const cachedUser = localStorage.getItem('user')
+
+  if (!cachedUser) return defaultProfile
+
+  const user = JSON.parse(cachedUser)
+
+  return {
+    firstName: user.firstName || defaultProfile.firstName,
+    lastName: user.lastName || defaultProfile.lastName,
+    email: user.email || defaultProfile.email,
+    phone: user.phone || defaultProfile.phone,
+    city: user.city || defaultProfile.city,
+    country: user.country || defaultProfile.country,
+  }
+}
+
 const MOCK_TRIPS = [
   { id: 1, name: 'Europe Adventure', dates: 'May 28 - Jun 09, 2025', cities: 4, status: 'completed', emoji: '🗼', budget: 20000, spent: 22000 },
   { id: 2, name: 'Paris & Rome Adventure', dates: 'Jun 14 - Jun 28, 2025', cities: 2, status: 'upcoming', emoji: '🍕', budget: 15000, spent: 8000 },
@@ -359,25 +387,64 @@ function ActivityLine({ activity, action }) {
 }
 
 function ProfileScreen() {
-  const [profile, setProfile] = useState({
-    firstName: 'James',
-    lastName: 'Cristina',
-    email: 'james@traveloop.app',
-    phone: '+91 98765 43210',
-    city: 'Delhi',
-    country: 'India',
-  })
-  const [savedProfile, setSavedProfile] = useState(profile)
+  const [profile, setProfile] = useState(getStoredProfile)
+  const [savedProfile, setSavedProfile] = useState(getStoredProfile)
   const [saveMessage, setSaveMessage] = useState('')
+  const [saveError, setSaveError] = useState('')
+  const [isSaving, setIsSaving] = useState(false)
 
   const updateProfile = (key, value) => {
     setProfile((current) => ({ ...current, [key]: value }))
     setSaveMessage('')
+    setSaveError('')
   }
 
-  const saveProfile = () => {
-    setSavedProfile(profile)
-    setSaveMessage('Profile updated')
+  const saveProfile = async () => {
+    const token = localStorage.getItem('token')
+
+    setIsSaving(true)
+    setSaveError('')
+    setSaveMessage('')
+
+    try {
+      if (token) {
+        const response = await fetch(`${API_BASE}/profile`, {
+          method: 'PUT',
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(profile),
+        })
+
+        if (!response.ok) {
+          throw new Error(`Profile update failed (${response.status})`)
+        }
+
+        const user = await response.json()
+        const nextProfile = {
+          firstName: user.firstName || '',
+          lastName: user.lastName || '',
+          email: user.email || profile.email,
+          phone: user.phone || '',
+          city: user.city || '',
+          country: user.country || '',
+        }
+
+        localStorage.setItem('user', JSON.stringify(user))
+        setProfile(nextProfile)
+        setSavedProfile(nextProfile)
+        setSaveMessage('Profile updated')
+      } else {
+        localStorage.setItem('user', JSON.stringify(profile))
+        setSavedProfile(profile)
+        setSaveMessage('Profile updated locally')
+      }
+    } catch (error) {
+      setSaveError(error.message)
+    } finally {
+      setIsSaving(false)
+    }
   }
 
   const profileFields = [
@@ -413,8 +480,9 @@ function ProfileScreen() {
           ))}
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', marginTop: '1rem', flexWrap: 'wrap' }}>
-          <button style={button()} onClick={saveProfile}>Save Changes</button>
+          <button style={button()} onClick={saveProfile} disabled={isSaving}>{isSaving ? 'Saving...' : 'Save Changes'}</button>
           {saveMessage && <span style={{ color: COLORS.green, fontWeight: 800, fontSize: '0.85rem' }}>{saveMessage}</span>}
+          {saveError && <span style={{ color: COLORS.red, fontWeight: 800, fontSize: '0.85rem' }}>{saveError}</span>}
         </div>
       </div>
       <div style={grid(180)}>{[['3', 'Trips Created', COLORS.accent], ['7', 'Cities Visited', COLORS.green], ['12', 'Activities Done', COLORS.blue]].map(([num, label, color]) => <div key={label} style={{ ...card, textAlign: 'center' }}><div style={{ color, fontSize: '2rem', fontWeight: 900 }}>{num}</div><div style={{ color: COLORS.muted }}>{label}</div></div>)}</div>
